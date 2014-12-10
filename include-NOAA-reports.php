@@ -366,7 +366,7 @@ $BIDI = $RTLlang?' style="unicode-bidi: bidi-override;direction: ltr;"':'';
 	$rpt = preg_replace('|°|Uis','&deg;',$rpt);
 	echo $rpt;
   }
- if (! $yr && ! $mo && ($Naming == "WV" || $naming == "WE") ) {  // special for 'current month' and wview
+ if (! $yr && ! $mo && ($Naming == "WV" || $Naming == "WE") ) {  // special for 'current month' and wview
     preg_match('|NOAA-(\d{4})-(\d{2})\.txt|i',$ThisMonthFile,$matches);
 	print "<!-- WV-matches\n".print_r($matches,true)."-->\n";
 	
