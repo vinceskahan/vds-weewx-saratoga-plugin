@@ -498,7 +498,7 @@ if ($haveSolar or $haveUV) {
 <tr class="table-top">
 <td colspan="2"><?php echo langtrans('CURRENT'); ?></td>
 <td rowspan="18" align="center">
-  <img src="<?php echo $graphImageDir; ?>dirplot.gif" width="381" height="361" alt="Wind direction plot"/>
+ <img src="<?php echo $graphImageDir; ?>../WD/daywindrose.png" width="381" height="361" alt="Wind direction plot"/>
 </td>
 </tr>
 
