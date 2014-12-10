@@ -1,4 +1,9 @@
 <?php
+#
+# modification note - modified for weewx-wd support using a WE type
+#     vinceskahan@gmail.com
+#
+# (original header follows)
 ############################################################################
 # A Project of TNET Services, Inc. and Saratoga-Weather.org (WD-World-ML template set)
 ############################################################################
@@ -51,9 +56,10 @@ $SITE['showSnowTemp'] 	= 4;	  // show snow instead of rain if temp (C) is <= thi
 # end of configurable settings
 #
 // do NOT change these
-$SITE['WXsoftware']     = 'WD';
-$SITE['WXsoftwareURL'] = 'http://www.weather-display.com/';
-$SITE['WXsoftwareLongName'] = 'Weather-Display';
+$SITE['WXsoftware']     = 'WE';
+$SITE['WXsoftwareURL'] = 'http://www.weewx.com/';
+$SITE['WXsoftwareLongName'] = 'Weewx';
 $SITE['ajaxDashboard'] = './ajax-dashboard.php';
-$SITE['trendsPage']     = 'WD-trends-inc.php'; // WD-specific trends page
+$SITE['trendsPage']     = 'WE-trends-inc.php'; // WE-specific trends page
+$SITE['NOAAdir']     = $SITE['HistoryFilesDir']; // to permit reusing WV noaa scripts
 ?>

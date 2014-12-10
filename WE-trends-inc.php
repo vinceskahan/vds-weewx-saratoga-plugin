@@ -1,4 +1,9 @@
 <?php
+//
+// this is the WD plugin file, simply renamed for weewx-wd
+//
+//--------------------------------------------------------
+//
 // this is the working section of the wxtrends.php page from the
 // Carterlake/AJAX/PHP templates from http://saratoga-weather.org/template/
 // Version 1.00 - Initial PHP version release

@@ -95,6 +95,9 @@ if ($Naming == 'CU') {
 if ($Naming == 'WV') {
   $validWX = true;
 }
+if ($Naming == 'WE') {
+  $validWX = true;
+}
 
 print "<!-- $NOAAversion -->\n";
 $WXparm = '';
@@ -141,6 +144,14 @@ if ($Naming == 'CU') {
   }
 }
 if ($Naming == 'WV') {
+// have to set ThisYearFile, ThisMonthFile now we know the date.
+  $ThisYearFile = $NOAAdir."NOAA-${now_year}.txt"; // points to your current NOAA yearly file
+  $ThisMonthFile= $NOAAdir."NOAA-${now_year}-${now_month}.txt"; // points to your current NOAA monthly file
+  if(!file_exists($ThisMonthFile)) {
+	  $ThisMonthFile = $NOAAdir."NOAA-${prior_year}-${prior_month}.txt";
+  }
+}
+if ($Naming == 'WE') {
 // have to set ThisYearFile, ThisMonthFile now we know the date.
   $ThisYearFile = $NOAAdir."NOAA-${now_year}.txt"; // points to your current NOAA yearly file
   $ThisMonthFile= $NOAAdir."NOAA-${now_year}-${now_month}.txt"; // points to your current NOAA monthly file
@@ -228,6 +239,8 @@ if ($handle = opendir("$NOAAdir")) {
        $year = substr($file,0,4);
 	} elseif ($Naming == 'WV') {
 		$year = substr($file,5,4);
+	} elseif ($Naming == 'WE') {
+		$year = substr($file,5,4);
 	} elseif ($Naming == 'CU') {
 		if (substr($file, 4, 2) == "MO") { // found a month report
 			$year = "20" .substr($file, 8, 2);
@@ -284,6 +297,7 @@ if ($handle = opendir("$NOAAdir")) {
    if ($Naming == 'VWS') {$t = "$yy.txt"; }
    if ($Naming == 'CU')  {$t = "NOAAYR$yy.txt"; }
    if ($Naming == 'WV')  {$t = "NOAA-$yy.txt"; }
+   if ($Naming == 'WE')  {$t = "NOAA-$yy.txt"; }
    
 //   if (isset($filesfound[$t]) || $yy == $now_year) {
    if (isset($filesfound[$t]) || (isset($ThisYearFile) and file_exists($ThisYearFile))) {
@@ -298,6 +312,7 @@ if ($handle = opendir("$NOAAdir")) {
 	 if ($Naming == 'VWS') {$testfile = "$yy" . "_" . "$mm.txt"; }
 	 if ($Naming == 'CU') {$testfile = "NOAAMO$mm" .substr($yy, 2,2). ".txt"; }
 	 if ($Naming == 'WV') {$testfile = "NOAA-$yy-$mm.txt"; }
+	 if ($Naming == 'WE') {$testfile = "NOAA-$yy-$mm.txt"; }
 	 
 	 if (isset($filesfound[$testfile])) {
 	   echo " <a href=\"$PHP_SELF?yr=$yy&amp;mo=$mm$WXparm\" class=\"noaa_rep_nav\"><b>" . $months[$mm]. "</b></a>";
@@ -343,7 +358,7 @@ if ($handle = opendir("$NOAAdir")) {
   }
 
 $BIDI = $RTLlang?' style="unicode-bidi: bidi-override;direction: ltr;"':'';
- if (! $yr && ! $mo && $Naming != "CU" && $Naming != "WV") {  // special for 'current month'
+ if (! $yr && ! $mo && $Naming != "CU" && $Naming != "WV" && $Naming != "WE") {  // special for 'current month'
     echo "<br /><b>".langtransstr('Report for')." $now_year ".$longmonths[$now_month]."</b>\n";
     $rpt = implode("",file("$ThisMonthFile"));
 	echo "<br />\n<pre$BIDI>\n";
@@ -351,7 +366,7 @@ $BIDI = $RTLlang?' style="unicode-bidi: bidi-override;direction: ltr;"':'';
 	$rpt = preg_replace('|°|Uis','&deg;',$rpt);
 	echo $rpt;
   }
- if (! $yr && ! $mo && $Naming == "WV") {  // special for 'current month' and wview
+ if (! $yr && ! $mo && ($Naming == "WV" || $naming == "WE") ) {  // special for 'current month' and wview
     preg_match('|NOAA-(\d{4})-(\d{2})\.txt|i',$ThisMonthFile,$matches);
 	print "<!-- WV-matches\n".print_r($matches,true)."-->\n";
 	
@@ -383,11 +398,13 @@ $BIDI = $RTLlang?' style="unicode-bidi: bidi-override;direction: ltr;"':'';
 		if ($Naming == 'VWS') {$testfile = "$yr" . "_" . "$mo.txt";}
 		if ($Naming == 'CU')  {$testfile = "NOAAMO$mo" .substr($yr, 2,2). ".txt";}
 		if ($Naming == 'WV')  {$testfile = "NOAA-$yr-$mo.txt";}
+		if ($Naming == 'WE')  {$testfile = "NOAA-$yr-$mo.txt";}
 	  } else { // no month given
 	    if ($Naming == 'WL')  {$testfile = "NOAA$yr.TXT";}
 		if ($Naming == 'VWS') {$testfile = "$yr.txt";}
 		if ($Naming == 'CU')  {$testfile = "NOAAYR$yr.txt";}
 		if ($Naming == 'WV')  {$testfile = "NOAA-$yr.txt";}
+		if ($Naming == 'WE')  {$testfile = "NOAA-$yr.txt";}
 	  } // no month given
      if (isset($filesfound[$testfile])) {
         echo "<br /><b>".langtransstr('Report for')." $yr ";
