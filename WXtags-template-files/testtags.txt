@@ -1,0 +1,989 @@
+<?php
+// converted tagslist.txt to .\tagslist.php for php tags
+// by gen-PHP-tagslist.pl - Version 1.00 - 07-Apr-2006
+// Author: Ken True - webmaster-weather.org
+// Edited: 20-Apr-2006 to trim unused tags
+// Version 1.01 - 25-Jan-2008 -- added Windy-rain to icon list
+// Version 1.02 - 24-Jun-2008 -- added variables to replace old trends-inc.html with trends-inc.php
+// Version 1.03 - 27-Oct-2008 -- added Snow and WU almanac variables
+// Version 1.04 - 03-Jun-2009 -- added moonrisedate/moonsetdate for wxastronomy.php
+// Version 1.05 - 11-Jul-2009 -- added tags for printable flyer, alternative dashboard, high/low/avg plugins
+//                               Thanks to Mike and Scott for their permission to add the above tags!
+// Version 1.06 - 12-Jul-2009 -- added tags for V4.0 of alternative dashboard
+// Version 1.07 - 23-Jul-2011 -- added support for multiple plugin scripts for WD - see comments for supported scripts
+/* 
+  1.07 includes support for:
+  
+WebsterWeather:  http://www.websterweatherlive.com/wxScripts.php
+  Alt-Dashboard 4.xx Script (Pre-Rainer's JavaScript) 	V4.30 	18-FEB-2011
+  Alt-Dashboard 5.xx Script 	V5.20 	18-FEB-2011
+  UpdatedAlt-Dashboard 6.xx Script 	V6.20 	27-JUN-2011
+  UpdatedMOBILE Dashboard 1.xx Script 	V1.30 	15-JUL-2011
+  High/Low/Averages Script Ver 3 Ajax-PHP Template Only 	V3.01 	25-MAR-2011
+
+642weather (MChallis) http://www.642weather.com/weather/scripts-printable-flyer.php
+  Printable Flyer Add-on for WD/PHP/AJAX Website Template V1.12  06-Nov-2009
+
+Eastmasonville http://eastmasonvilleweather.com/downloads.php
+  Station Records (wxrecords)  V1.13 - 24-May-2011
+
+Relayweather http://www.relayweather.com/downloads.php
+  Temperature and Rain Trending (wxglobalwarming) 	V1.0 	20-Jan-2010
+
+end of 1.07 update description
+*/
+// --------------------------------------------------------------------------
+// allow viewing of generated source
+
+if ( isset($_REQUEST['sce']) && strtolower($_REQUEST['sce']) == 'view' ) {
+//--self downloader --
+   $filenameReal = __FILE__;
+   $download_size = filesize($filenameReal);
+   header('Pragma: public');
+   header('Cache-Control: private');
+   header('Cache-Control: no-cache, must-revalidate');
+   header('Content-type: text/plain');
+   header('Accept-Ranges: bytes');
+   header("Content-Length: $download_size");
+   header('Connection: close');
+   
+   readfile($filenameReal);
+   exit;
+}
+// Units
+// -----
+$uomtemp = '%uomtemp%'; //  = 'C', 'F',  (or  '°C', '°F', or '&deg;C', '&deg;F' )
+$uombaro = '%uombaro%'; //  = 'inHg', 'hPa', 'kPa', 'mb'
+$uomwind = '%uomwind%'; //  = 'kts','mph','kmh','km/h','m/s','Bft'
+$uomrain = '%uomrain%'; //  = 'mm', 'in'
+$datefmt = '%datefmt%'; //  = 'd/m/y', 'm/d/y'
+$uomdistance = '%uomdistance%'; // = 'mi','km'  (for windrun variables)
+//
+// General OR Non Weather Specific/SUN/MOON
+// ========================================
+$time =  '%time%';	// current time
+$date =  '%date%';	// current date
+$sunrise =  '%sunrise%';	// sun rise time (make sure you have the correct lat/lon
+// 		            in view/sun moon)
+$time_minute =  '%time-minute%';	// Current minute
+$time_hour =  '%time-hour%';	// Current hour
+$date_day =  '%date-day%';	// Current day
+$date_month =  '%date-month%';	// Current month
+$date_year =  '%date-year%';	// Current year
+$monthname =  '%monthname%';	// Current month name
+$dayname =  '%dayname%';	// Current day name
+$sunset =  '%sunset%';	// sunset time
+$moonrisedate =  '%moonrisedate%';	// moon rise date
+$moonrise =  '%moonrise%';	// moon rise time
+$moonsetdate =  '%moonsetdate%';	// moon set date
+$moonset =  '%moonset%';	// moon set time
+$moonage =  '%moonage%';	// current age of the moon (days since new moon)
+$moonphase =  '%moonphase%';	// Moon phase %
+$moonphasename = '%moonphasename%'; // 10.36z addition
+$marchequinox =  '%marchequinox%';	// March equinox date
+$junesolstice =  '%junesolstice%';	// June solstice date
+$sepequinox =  '%sepequinox%';	// September equinox date
+$decsolstice =  '%decsolstice%';	// December solstice date
+$moonperihel =  '%moonperihel%';	// Next Moon perihel date
+$moonaphel =  '%moonaphel%';	// Next moon perihel date
+$moonperigee =  '%moonperigee%';	// Next moon perigee date
+$moonapogee =  '%moonapogee%';	// Next moon apogee date
+$newmoon =  '%newmoon%';	// Date/time of the next/last new moon
+$nextnewmoon =  '%nextnewmoon%';	// Date/time of the next new moon for next month
+$firstquarter =  '%firstquarter%';	// Date/time of the next/last first quarter moon
+$lastquarter =  '%lastquarter%';	// Date/time of the next/last last quarter moon
+$fullmoon =  '%fullmoon%';	// Date/time of the next/last full moon
+$fullmoondate =  '%fullmoondate%';	// Date of the next/last full moon (date only)
+$suneclipse =  '%suneclipse%';	// Next sun eclipse
+$mooneclipse =  '%mooneclipse%';	// Next moon eclipse date
+$easterdate =  '%easterdate%';	// Next easter date
+$chinesenewyear =  '%chinesenewyear%';	// Chinese new year
+$hoursofpossibledaylight =  '%hoursofpossibledaylight%';	// Total hours/minutes of possible daylight for today
+//
+$weatherreport =  '%weatherreport%';	// current weather conditions from selected METAR
+$stationaltitude =  '%stationaltitude%';	// Station altitude, feet, as set in the units setup
+// this under setup)
+$stationlatitude =  '%stationlatitude%';	// Latitude (from the sun moon rise/set setup)
+$stationlongitude =  '%stationlongitude%';	// Longtitude (from the sun moon rise/set setup)
+$windowsuptime = '%windowsuptime%'; // uptime for windows on weather pc
+$freememory = '%freememory%'; // amount of free memory on the pc
+$Startimedate = '%Startimedate%'; // Time/date WD was started
+
+$NOAAEvent = '%NOAAEvent%'; // NOAA Watch/Warning/Advisory
+$noaawarningraw = '%noaawarningraw%'; // NOAA RAW watch/warning/advisory
+
+$wdversion = '%wdversion%' . '-(b' . '%wdbuild%' . ')';	// Weather Display version number you are running
+$wdversiononly = '%wdversion%';
+$wdbuild   = '%wdbuild%';       // Weather Display build number you are running
+$noaacityname =  '%noaacityname%';	// City name,from the noaa setup (in the av/ext setup)
+// 
+$timeofnextupdate =  '%timeofnextupdate%';	// Time of next Update/Upload of the weather data to your web page (based on the web table update 
+// 
+$heatcolourword =  '%heatcolourword%';	// How hot/cold it feels at the moment, based on the humidex, used with the conditionscolour.jpg 
+// 
+// 
+// Temperature/Humidity
+// ====================
+// Current:
+// --------
+$temperature =  '%temp%';	// temperature
+$tempnodp = '%tempnodp%'; // temperature, no decimal place
+$humidity =  '%hum%';	// humidity
+$dewpt =  '%dew%';	// dew point
+$maxtemp =  '%maxtemp%';	// today's maximum temperature
+$maxtempt =  '%maxtempt%';	// time this occurred
+$mintemp =  '%mintemp%';	// today's minimum temperature
+$mintempt =  '%mintempt%';	// time this occurred
+$feelslike =  '%feelslike%';	// Shows heat index or humidex or windchill (if less than 16oC)
+
+$heati =  '%heati%';	// current heat index
+$heatinodp =  '%heatinodp%';	// current heat index,no decimal place
+$windch =  '%windch%';	// current wind-chill
+$windchnodp =  '%windchnodp%';	// current wind-chill, no decimal place
+$humidexfaren =  '%humidexfaren%';	// Humidex value in oF
+$humidexcelsius =  '%humidexcelsius%';	// Humidex value in oC
+
+$apparenttemp =  '%apparenttemp%';	// Apparent temperature
+$apparentsolartemp =  '%apparentsolartemp%';	// Apparent temperature in the sun (you need a solar sensor)
+$apparenttempc =  '%apparenttempc%';	// Apparent temperature, °C
+$apparentsolartempc =  '%apparentsolartempc%';	// Apparent temperature in the sun, °C (you need a solar sensor)
+$apparenttempf =  '%apparenttempf%';	// Apparent temperature, °F
+$apparentsolartempf =  '%apparentsolartempf%';	// Apparent temperature in the sun, °F (you need a solar sensor)
+// 
+$WUmaxtemp = '%WUmaxtemp%';	// Todays average max temperature from the selected Wunderground almanac station
+$WUmintemp = '%WUmintemp%';	// Todays average min temperature from the selected Wunderground almanac station
+// 
+$WUmaxtempr = '%WUmaxtempr%';	// Todays record max temperature from the selected Wunderground almanac station
+$WUmintempr = '%WUmintempr%';	// Todays record min temperature from the selected Wunderground almanac station
+$WUmaxtempryr = '%WUmaxtempryr%';	// Year that it occured
+$WUmintempryr = '%WUmintempryr%';	// year that it occured
+// 
+// 
+// Yesterday:
+// ----------
+$tempchangehour =  '%tempchangehour%';	// Temperature change in the last hour
+$maxtempyest =  '%maxtempyest%';	// Yesterday's max temperature
+$maxtempyestt =  '%maxtempyestt%';	// Time of yesterday's max temperature
+$mintempyest =  '%mintempyest%';	// Yesterday's min temperature
+$mintempyestt =  '%mintempyestt%';	// Time of yesterday's min temperature
+// 
+// 
+// Trends:
+// -------
+$temp24hoursago =  '%temp24hoursago%';	// The temperature 24 hours ago
+$humchangelasthour =  '%humchangelasthour%';	// Humidity change last hour
+$dewchangelasthour =  '%dewchangelasthour%';	// Dew point change last hour
+$barochangelasthour =  '%barochangelasthour%';	// Baro change last hour
+// 
+// Wind
+// ====
+// Current:
+// --------
+// 
+$avgspd =  '%avgspd%';	// average wind speed (current)
+$gstspd =  '%gstspd%';	// current/gust wind speed
+$maxgst =  '%maxgst%';	// today's maximum wind speed
+$maxgstt =  '%maxgstt%';	// time this occurred
+$maxgsthr =  '%maxgsthr%';	// maximum gust last hour
+$dirdeg =  '%dirdeg%';	// wind direction (degrees)
+$dirlabel =  '%dirlabel%';	// wind direction (NNE etc)
+//$maxgustlastimediatehourtime =  '%maxgustlastimediatehourtime%';	// %maxgustlastimediatehourtime%  time that the max gust last prior 1 hour occured
+$avwindlastimediate10 =  '%avwindlastimediate10%';	// Average wind for the last immediate 10 minute period
+// $avdir10minute =  '%avdir10minute%';	// average ten minute wind direction (degrees)
+
+$beaufortnum ='%beaufortnum%'; //Beaufort wind force number
+$currbftspeed = '%currbftspeed%'; //Current Beaufort wind speed
+
+$bftspeedtext = '%bftspeedtext%'; //Beaufort scale in text (i.e Fresh Breeze)
+// 
+// 
+// Baromometer
+// ===========
+// Current:
+// --------
+$baro = '%baro%';  // current barometer
+$baroinusa2dp =  '%baroinusa2dp%';	// Current barometer reading in inches, 2 decimal places only.
+$trend =  '%trend%';	// amount of change in the last hour
+$pressuretrendname =  '%pressuretrendname%';	// pressure trend (i.e. 'falling'), last hour
+$pressuretrendname3hour =  '%pressuretrendname3hour%';	// pressure trend (i.e. 'falling'), last 3 hours
+
+$vpforecasttext = '%vpforecasttext%';	// Forecast text from the Davis VP
+// 
+// 
+// Rain
+// ====
+// Current:
+// --------
+$dayrn =  '%dayrn%';	// today's rain
+$monthrn =  '%monthrn%';	// rain so far this month
+$yearrn =  '%yearrn%';	// rain so far this year
+$dayswithnorain =  '%dayswithnorain%';	// Consecutative days with no rain
+$dayswithrain =  '%dayswithrain%';	// Days with rain for the month
+$dayswithrainyear =  '%dayswithrainyear%';	// Days with rain for the year
+$currentrainratehr =  '%currentrainratehr%';	// Current rain rate, mm/hr (or in./hr)
+$maxrainrate =  '%maxrainrate%';	// Max rain rate,for the day, mm/min (or in./min)
+$maxrainratehr =  '%maxrainratehr%';	// Max rain rate,for the day, mm/hr (or in.mm)
+$maxrainratetime =  '%maxrainratetime%';	// Time that occurred
+// Yesterday:
+// ----------
+$yesterdayrain =  '%yesterdayrain%';	// Yesterday rain
+//
+$vpstormrainstart = '%vpstormrainstart%';  //Davis VP Storm rain start date
+$vpstormrain = '%vpstormrain%';           //Davis VP Storm rain value
+//
+// 
+// Sunshine/Solar/ET
+// =================
+$VPsolar =  '%VPsolar%';	//  Solar energy number (W/M2)
+$VPuv =  '%VPuv%';	// UV number 
+$highsolar =  '%highsolar%';	// Daily high solar (for Davis VP and Grow stations)
+$highuv =  '%highuv%';	// Daily high UV (for Davis VP stations)
+$currentsolarpercent =  '%currentsolarpercent%';	// Current solar percent for stations with a temperature solar sensor (like the dallas 1 wire)
+$highsolartime =  '%highsolartime%';	// Time that the daily high solar occured
+$lowsolartime =  '%lowsolartime%';	// Time that the daily low solar occured
+$highuvtime =  '%highuvtime%';	// Time that the daily high UV occured
+$lowuvtime =  '%lowuvtime%';	// Time that the daily low UV occured
+$highuvyest =  '%highuvyest%';	// Yesterday's high UV
+$highuvyesttime =  '%highuvyesttime%';	// Time of yesterday's high UV
+$burntime =  '%burntime%';	// Time (minutes) to burn (normal skin) at the current UV rate, from the Davis VP with UV sensor
+// 
+// the solar setup.
+// 
+// 
+// Number of resynchronizations, The largest number of packets in a row that were received., and the number of CRC errors 
+// 
+// detected. 
+// 
+// 
+// Record Readings
+// ===============
+// 
+// for current month to date:
+// 
+$mrecordwindgust =  '%mrecordwindgust%';	// All time record high wind gust
+$mrecordhighgustday =  '%mrecordhighgustday%';	// Day of record high wind gust
+// 
+// 
+// Snow
+// =====
+// 
+$snowseasonin = '%snowseasonin.%';	// Snow for season you have entered under input daily weather, inches
+$snowmonthin = '%snowmonthin.%';	// Snow for month you have entered under input daily weather, inches
+$snowtodayin = '%snowtodayin.%';	// Snow for today you have entered under input daily weather, inches
+$snowseasoncm = '%snowseasoncm%';	// Snow for season you have entered under input daily weather, cm
+$snowmonthcm = '%snowmonthcm%';	// Snow for month you have entered under input daily weather, cm
+$snowtodaycm = '%snowtodaycm%';	// Snow for today you have entered under input daily weather, cm
+$snowyesterday = '%snowyesterday%';	// Yesterdays' snow
+$snowheight = '%snowheight%';	// Estimated height snow will fall at
+$snowheightnew = '%snowheightnew%';	// Estimated height snow will fall at, new formula
+// 
+$snownowin = '%snownowin.%';	// Current snow depth, inches.
+$snownowcm = '%snownowcm%';	// Current snow depth, cm.
+// 
+$snowrain = '%snowrain%';	// Rain measure by a heated rain gauge when temp below freezing times 10 to give estimated snow fall
+$snowdaysthismonth = '%snowdaysthismonth%';	// Days with snow this month
+$snowdaysthisyear = '%snowdaysthisyear%';	// Days with snow this year
+//
+// tags needed for trends-inc.php
+//
+$temp0minuteago = '%temp0minuteago%';  // ****this one is needed for all the others to work
+$wind0minuteago = '%wind0minuteago%';
+$gust0minuteago = '%gust0minuteago%';
+$dir0minuteago = '%dir0minuteago%';
+$hum0minuteago = '%hum0minuteago%';
+$dew0minuteago = '%dew0minuteago%';
+$baro0minuteago = '%baro0minuteago%';
+$rain0minuteago = '%rain0minuteago%';
+$VPsolar0minuteago = '%VPsolar0minuteago%';
+$VPuv0minuteago = '%VPuv0minuteago%';
+
+$temp5minuteago = '%temp5minuteago%';  
+$wind5minuteago = '%wind5minuteago%';
+$gust5minuteago = '%gust5minuteago%';
+$dir5minuteago = '%dir5minuteago%';
+$hum5minuteago = '%hum5minuteago%';
+$dew5minuteago = '%dew5minuteago%';
+$baro5minuteago = '%baro5minuteago%';
+$rain5minuteago = '%rain5minuteago%';
+$VPsolar5minuteago = '%VPsolar5minuteago%';
+$VPuv5minuteago = '%VPuv5minuteago%';
+
+$temp10minuteago = '%temp10minuteago%';  
+$wind10minuteago = '%wind10minuteago%';
+$gust10minuteago = '%gust10minuteago%';
+$dir10minuteago = '%dir10minuteago%';
+$hum10minuteago = '%hum10minuteago%';
+$dew10minuteago = '%dew10minuteago%';
+$baro10minuteago = '%baro10minuteago%';
+$rain10minuteago = '%rain10minuteago%';
+$VPsolar10minuteago = '%VPsolar10minuteago%';
+$VPuv10minuteago = '%VPuv10minuteago%';
+
+$temp15minuteago = '%temp15minuteago%';  
+$wind15minuteago = '%wind15minuteago%';
+$gust15minuteago = '%gust15minuteago%';
+$dir15minuteago = '%dir15minuteago%';
+$hum15minuteago = '%hum15minuteago%';
+$dew15minuteago = '%dew15minuteago%';
+$baro15minuteago = '%baro15minuteago%';
+$rain15minuteago = '%rain15minuteago%';
+$VPsolar15minuteago = '%VPsolar15minuteago%';
+$VPuv15minuteago = '%VPuv15minuteago%';
+
+$temp20minuteago = '%temp20minuteago%';  
+$wind20minuteago = '%wind20minuteago%';
+$gust20minuteago = '%gust20minuteago%';
+$dir20minuteago = '%dir20minuteago%';
+$hum20minuteago = '%hum20minuteago%';
+$dew20minuteago = '%dew20minuteago%';
+$baro20minuteago = '%baro20minuteago%';
+$rain20minuteago = '%rain20minuteago%';
+$VPsolar20minuteago = '%VPsolar20minuteago%';
+$VPuv20minuteago = '%VPuv20minuteago%';
+
+$temp30minuteago = '%temp30minuteago%';  
+$wind30minuteago = '%wind30minuteago%';
+$gust30minuteago = '%gust30minuteago%';
+$dir30minuteago = '%dir30minuteago%';
+$hum30minuteago = '%hum30minuteago%';
+$dew30minuteago = '%dew30minuteago%';
+$baro30minuteago = '%baro30minuteago%';
+$rain30minuteago = '%rain30minuteago%';
+$VPsolar30minuteago = '%VPsolar30minuteago%';
+$VPuv30minuteago = '%VPuv30minuteago%';
+
+$temp45minuteago = '%temp45minuteago%';  
+$wind45minuteago = '%wind45minuteago%';
+$gust45minuteago = '%gust45minuteago%';
+$dir45minuteago = '%dir45minuteago%';
+$hum45minuteago = '%hum45minuteago%';
+$dew45minuteago = '%dew45minuteago%';
+$baro45minuteago = '%baro45minuteago%';
+$rain45minuteago = '%rain45minuteago%';
+$VPsolar45minuteago = '%VPsolar45minuteago%';
+$VPuv45minuteago = '%VPuv45minuteago%';
+
+$temp60minuteago = '%temp60minuteago%';  
+$wind60minuteago = '%wind60minuteago%';
+$gust60minuteago = '%gust60minuteago%';
+$dir60minuteago = '%dir60minuteago%';
+$hum60minuteago = '%hum60minuteago%';
+$dew60minuteago = '%dew60minuteago%';
+$baro60minuteago = '%baro60minuteago%';
+$rain60minuteago = '%rain60minuteago%';
+$VPsolar60minuteago = '%VPsolar60minuteago%';
+$VPuv60minuteago = '%VPuv60minuteago%';
+
+$temp75minuteago = '%temp75minuteago%';  
+$wind75minuteago = '%wind75minuteago%';
+$gust75minuteago = '%gust75minuteago%';
+$dir75minuteago = '%dir75minuteago%';
+$hum75minuteago = '%hum75minuteago%';
+$dew75minuteago = '%dew75minuteago%';
+$baro75minuteago = '%baro75minuteago%';
+$rain75minuteago = '%rain75minuteago%';
+$VPsolar75minuteago = '%VPsolar75minuteago%';
+$VPuv75minuteago = '%VPuv75minuteago%';
+
+$temp90minuteago = '%temp90minuteago%';  
+$wind90minuteago = '%wind90minuteago%';
+$gust90minuteago = '%gust90minuteago%';
+$dir90minuteago = '%dir90minuteago%';
+$hum90minuteago = '%hum90minuteago%';
+$dew90minuteago = '%dew90minuteago%';
+$baro90minuteago = '%baro90minuteago%';
+$rain90minuteago = '%rain90minuteago%';
+$VPsolar90minuteago = '%VPsolar90minuteago%';
+$VPuv90minuteago = '%VPuv90minuteago%';
+
+$temp105minuteago = '%temp105minuteago%';  
+$wind105minuteago = '%wind105minuteago%';
+$gust105minuteago = '%gust105minuteago%';
+$dir105minuteago = '%dir105minuteago%';
+$hum105minuteago = '%hum105minuteago%';
+$dew105minuteago = '%dew105minuteago%';
+$baro105minuteago = '%baro105minuteago%';
+$rain105minuteago = '%rain105minuteago%';
+$VPsolar105minuteago = '%VPsolar105minuteago%';
+$VPuv105minuteago = '%VPuv105minuteago%';
+
+$temp120minuteago = '%temp120minuteago%';  
+$wind120minuteago = '%wind120minuteago%';
+$gust120minuteago = '%gust120minuteago%';
+$dir120minuteago = '%dir120minuteago%';
+$hum120minuteago = '%hum120minuteago%';
+$dew120minuteago = '%dew120minuteago%';
+$baro120minuteago = '%baro120minuteago%';
+$rain120minuteago = '%rain120minuteago%';
+$VPsolar120minuteago = '%VPsolar120minuteago%';
+$VPuv120minuteago = '%VPuv120minuteago%';
+
+$VPet = '%VPet%';
+$VPetmonth = '%VPetmonth%';
+$dateoflastrainalways = '%dateoflastrainalways%';
+$highbaro = '%highbaro%';
+$highbarot = '%highbarot%';
+$highsolaryest = '%highsolaryest%';
+$highsolaryesttime = '%highsolaryesttime%';
+$hourrn = '%hourrn%';
+$maxaverageyest = '%maxaverageyest%';
+$maxaverageyestt = '%maxaverageyestt%';
+$maxavgdirectionletter = '%maxavgdirectionletter%';
+$maxavgspd = '%maxavgspd%';
+$maxavgspdt = '%maxavgspdt%';
+$maxbaroyest = '%maxbaroyest%';
+$maxbaroyestt = '%maxbaroyestt%';
+$maxgstdirectionletter = '%maxgstdirectionletter%';
+$maxgustyest = '%maxgustyest%';
+$maxgustyestt = '%maxgustyestt%';
+$mcoldestdayonrecord = '%mcoldestdayonrecord%';
+$mcoldestnightonrecord = '%mcoldestnightonrecord%';
+$minchillyest = '%minchillyest%';
+$minchillyestt = '%minchillyestt%';
+$minwindch = '%minwindch%';
+$minwindcht = '%minwindcht%';
+$mrecordhighavwindday = '%mrecordhighavwindday%';
+$mrecordhighavwindmonth = '%mrecordhighavwindmonth%';
+$mrecordhighavwindyear = '%mrecordhighavwindyear%';
+$mrecordhighbaro = '%mrecordhighbaro%';
+$mrecordhighbaroday = '%mrecordhighbaroday%';
+$mrecordhighbaromonth = '%mrecordhighbaromonth%';
+$mrecordhighbaroyear = '%mrecordhighbaroyear%';
+$mrecordhighgustmonth = '%mrecordhighgustmonth%';
+$mrecordhighgustyear = '%mrecordhighgustyear%';
+$mrecordhightemp = '%mrecordhightemp%';
+$mrecordhightempday = '%mrecordhightempday%';
+$mrecordhightempmonth = '%mrecordhightempmonth%';
+$mrecordhightempyear = '%mrecordhightempyear%';
+$mrecordlowchill = '%mrecordlowchill%';
+$mrecordlowchillday = '%mrecordlowchillday%';
+$mrecordlowchillmonth = '%mrecordlowchillmonth%';
+$mrecordlowchillyear = '%mrecordlowchillyear%';
+$mrecordlowtemp = '%mrecordlowtemp%';
+$mrecordlowtempday = '%mrecordlowtempday%';
+$mrecordlowtempmonth = '%mrecordlowtempmonth%';
+$mrecordlowtempyear = '%mrecordlowtempyear%';
+$mrecordwindspeed = '%mrecordwindspeed%';
+$mwarmestdayonrecord = '%mwarmestdayonrecord%';
+$mwarmestnightonrecord = '%mwarmestnightonrecord%';
+$raincurrentweek = '%raincurrentweek%';
+$raintodatemonthago = '%raintodatemonthago%';
+$raintodateyearago = '%raintodateyearago%';
+$timeoflastrainalways = '%timeoflastrainalways%';
+$windruntodatethismonth = '%windruntodatethismonth%';
+$windruntodatethisyear = '%windruntodatethisyear%';
+$windruntoday = '%windruntoday%';
+$yesterdaydaviset = '%yesterdaydaviset%';
+$yrecordhighavwindday = '%yrecordhighavwindday%';
+$yrecordhighavwindmonth = '%yrecordhighavwindmonth%';
+$yrecordhighavwindyear = '%yrecordhighavwindyear%';
+$yrecordhighbaro = '%yrecordhighbaro%';
+$yrecordhighbaroday = '%yrecordhighbaroday%';
+$yrecordhighbaromonth = '%yrecordhighbaromonth%';
+$yrecordhighbaroyear = '%yrecordhighbaroyear%';
+$yrecordhighgustday = '%yrecordhighgustday%';
+$yrecordhighgustmonth = '%yrecordhighgustmonth%';
+$yrecordhighgustyear = '%yrecordhighgustyear%';
+$yrecordhightemp = '%yrecordhightemp%';
+$yrecordhightempday = '%yrecordhightempday%';
+$yrecordhightempmonth = '%yrecordhightempmonth%';
+$yrecordhightempyear = '%yrecordhightempyear%';
+$yrecordlowchill = '%yrecordlowchill%';
+$yrecordlowchillday = '%yrecordlowchillday%';
+$yrecordlowchillmonth = '%yrecordlowchillmonth%';
+$yrecordlowchillyear = '%yrecordlowchillyear%';
+$yrecordlowtemp = '%yrecordlowtemp%';
+$yrecordlowtempday = '%yrecordlowtempday%';
+$yrecordlowtempmonth = '%yrecordlowtempmonth%';
+$yrecordlowtempyear = '%yrecordlowtempyear%';
+$yrecordwindgust = '%yrecordwindgust%';
+$yrecordwindspeed = '%yrecordwindspeed%';
+$daysTmaxGT30C = '%daysTmax>30C%';
+$daysTmaxGT25C = '%daysTmax>25C%';
+$daysTminLT0C = '%daysTmin<0C%';
+$daysTminLTm15C = '%daysTmin<-15C%';
+
+// end of trends-inc.php variables
+
+//  
+   // CURRENT CONDITIONS ICONS FOR clientraw.txt
+   // create array for icons. There are 35 possible values in clientraw.txt
+   // It would be simpler to do this with array() but to make it easier to 
+   // modify each element is defined individually. Each index [#] corresponds
+   // to the value provided in clientraw.txt
+   $icon_array[0] =  'day_clear.gif';            // imagesunny.visible
+   $icon_array[1] =  'night_clear.gif';          // imageclearnight.visible
+   $icon_array[2] =  'day_partly_cloudy.gif';    // imagecloudy.visible
+   $icon_array[3] =  'day_partly_cloudy.gif';    // imagecloudy2.visible
+   $icon_array[4] =  'night_partly_cloudy.gif';  // imagecloudynight.visible
+   $icon_array[5] =  'day_partly_cloudy.gif';            // imagedry.visible
+   $icon_array[6] =  'fog.gif';                  // imagefog.visible
+   $icon_array[7] =  'haze.gif';                 // imagehaze.visible
+   $icon_array[8] =  'day_heavy_rain.gif';       // imageheavyrain.visible
+   $icon_array[9] =  'day_mostly_sunny.gif';     // imagemainlyfine.visible
+   $icon_array[10] =  'mist.gif';                // imagemist.visible
+   $icon_array[11] =  'fog.gif';                 // imagenightfog.visible
+   $icon_array[12] =  'night_heavy_rain.gif';    // imagenightheavyrain.visible
+   $icon_array[13] =  'night_cloudy.gif';        // imagenightovercast.visible
+   $icon_array[14] =  'night_rain.gif';          // imagenightrain.visible
+   $icon_array[15] =  'night_light_rain.gif';    // imagenightshowers.visible
+   $icon_array[16] =  'night_snow.gif';          // imagenightsnow.visible
+   $icon_array[17] =  'night_tstorm.gif';        // imagenightthunder.visible
+   $icon_array[18] =  'day_cloudy.gif';          // imageovercast.visible
+   $icon_array[19] =  'day_partly_cloudy.gif';   // imagepartlycloudy.visible
+   $icon_array[20] =  'day_rain.gif';            // imagerain.visible
+   $icon_array[21] =  'day_rain.gif';            // imagerain2.visible
+   $icon_array[22] =  'day_light_rain.gif';      // imageshowers2.visible
+   $icon_array[23] =  'sleet.gif';               // imagesleet.visible
+   $icon_array[24] =  'sleet.gif';               // imagesleetshowers.visible
+   $icon_array[25] =  'snow.gif';                // imagesnow.visible
+   $icon_array[26] =  'snow.gif';                // imagesnowmelt.visible
+   $icon_array[27] =  'snow.gif';                // imagesnowshowers2.visible
+   $icon_array[28] =  'day_clear.gif.gif';       // imagesunny.visible
+   $icon_array[29] =  'day_tstorm.gif';          // imagethundershowers.visible
+   $icon_array[30] =  'day_tstorm.gif';          // imagethundershowers2.visible
+   $icon_array[31] =  'day_tstorm.gif';          // imagethunderstorms.visible
+   $icon_array[32] =  'tornado.gif';             // imagetornado.visible
+   $icon_array[33] =  'windy.gif';               // imagewindy.visible
+   $icon_array[34] =  'day_partly_cloudy.gif';   // stopped raining
+   $icon_array[35] =  'windyrain.gif';           // Wind+rain
+   $iconnumber = '%iconnumber%';                // icon number
+
+   $current_icon = $icon_array[%iconnumber%]; // name of our condition icon
+// ----------------------------------------------------------------------------------
+//   $current_summary = '%weathercond%' . '<br />' . '%Currentsolardescription% ';
+   $weathercond = '%weathercond%';
+   $Currentsolardescription = '%Currentsolardescription% ';
+   $current_summary = $Currentsolardescription;
+   $current_summary = preg_replace('|^/[^/]+/|','',$current_summary);
+   $current_summary = preg_replace('|\\\\|',', ',$current_summary);
+   $current_summary = preg_replace('|/|',', ',$current_summary);
+//  
+//  
+$cloudheightfeet =  '%cloudheightfeet%';	// Estimated cloud base height, feet, (based on dew point, and you height above sea  level...enter
+$cloudheightmeters =  '%cloudheightmeters%';	// Estimated cloud base height, metres, (based on dew point, and you height above sea
+
+// end of stock testtags.txt
+
+// ----------------------------------------------------------------------------------------------------
+// begin mchallis tags added to testtags.txt for printable flyer
+$maxgsthrtime = '%maxgustlastimediatehourtime%';        // time that the max gust last prior 1 hour occured
+$minbaroyest  = '%minbaroyest%';
+$minbaroyestt = '%minbaroyestt%';
+$mrecordlowbaro = '%mrecordlowbaro%';
+$mrecordlowbaroday = '%mrecordlowbaroday%';
+$mrecordlowbaromonth = '%mrecordlowbaromonth%';
+$mrecordlowbaroyear = '%mrecordlowbaroyear%';
+$yrecordlowbaro = '%yrecordlowbaro%';
+$yrecordlowbaroday = '%yrecordlowbaroday%';
+$yrecordlowbaromonth = '%yrecordlowbaromonth%';
+$yrecordlowbaroyear = '%yrecordlowbaroyear%';
+// end mchallis tags added to testtags.txt for printable flyer
+// ----------------------------------------------------------------------------------------------------
+// New WebsterWeatherLive VER 4.10 tags
+//----------------------------------------------
+$lighteningbearing = '%nexstormbearing%';
+$lighteningdistance = '%nexstormdistance%';
+$lighteningcountlasthournextstorm = '%lighteningcountlasthournextstorm%';
+$lighteningcountlastminutenextstorm = '%lighteningcountlastminutenextstorm%';
+$lighteningcountlast12hournextstorm = '%lighteningcountlast12hournextstorm%';
+$lighteningcountlast30minutesnextstorm = '%lighteningcountlast30minutesnextstorm%';
+$timeofdaygreeting = '%timeofdaygreeting%';
+$avwindlastimediate60 = '%avwindlastimediate60%'; // average wind speed
+$avwindlastimediate120 = '%avwindlastimediate120%'; // average wind speed
+$currentmonthaveragerain = '%currentmonthaveragerain%'; // average rain for current month
+//
+// version 5.00+ 
+$avwindlastimediate15 = '%avwindlastimediate15%'; // average wind speed
+$avwindlastimediate30 = '%avwindlastimediate30%'; // average wind speed
+$todayhihumidex = '%todayhihumidex%'; //daily high humidex
+$todaylohumidex = '%todaylohumidex%'; //Daily low Humidex
+//Version 5.02
+$dayornight = '%dayornight%'; // Day or night flag
+
+//Version 6.20
+$tempchangelasthourfaren = '%tempchangelasthourfaren%'; //For snow prediction
+$abshum = '%abshum%'; //For snow prediction
+$maxtemp4today = '%maxtempfortodayfromyourdata%'; // max from station's records
+$mintemp4today = '%mintempfortodayfromyourdata%'; // min from station's records
+$maxtemp4todayyr = '%yearmaxtempfortodayfromyourdata%'; // max year from station's records
+$mintemp4todayyr = '%yearmintempfortodayfromyourdata%'; // min year from station's records
+$avsnowjan = '%avsnowjan%'; //Average snow for jan from your inputted snow data (cm)
+$avsnowfeb = '%avsnowfeb%'; //Average snow for feb from your inputted snow data (cm)
+$avsnowmar = '%avsnowmar%'; //Average snow for mar from your inputted snow data (cm)
+$avsnowapr = '%avsnowapr%'; //Average snow for apr from your inputted snow data (cm)
+$avsnowmay = '%avsnowmay%'; //Average snow for may from your inputted snow data (cm)
+$avsnowjun = '%avsnowjun%'; //Average snow for may from your inputted snow data (cm)
+$avsnowjul = '%avsnowjul%'; //Average snow for jul from your inputted snow data (cm)
+$avsnowaug = '%avsnowaug%'; //Average snow for aug from your inputted snow data (cm)
+$avsnowsep = '%avsnowsep%'; //Average snow for sep from your inputted snow data (cm)
+$avsnowoct = '%avsnowoct%'; //Average snow for oct from your inputted snow data (cm)
+$avsnownov = '%avsnownov%'; //Average snow for nov from your inputted snow data (cm)
+$avsnowdec = '%avsnowdec%'; //Average snow for dec from your inputted snow data (cm)
+$avsnowjannow = '%nowsnowjan%';
+$avsnowfebnow = '%nowsnowfeb%';
+$avsnowmarnow = '%nowsnowmar%';
+$avsnowaprnow = '%nowsnowapr%';
+$avsnowmaynow = '%nowsnowmay%';
+$avsnowjunnow = '%nowsnowjun%';
+$avsnowjulnow = '%nowsnowjul%';
+$avsnowaugnow = '%nowsnowaug%';
+$avsnowsepnow = '%nowsnowsep%';
+$avsnowoctnow = '%nowsnowoct%';
+$avsnownovnow = '%nowsnownov%';
+$avsnowdecnow = '%nowsnowdec%';
+// end of websterweather additions
+// ----------------------------------------------------------------------------------------------------
+// relayweather wxglobalwarming
+// For Temperature Trend Chart, you Need to add the following to your testtags file if they don't yet exist:
+
+$avtempjannow = '%avtempjannow%';
+$avtempfebnow = '%avtempfebnow%';
+$avtempmarnow = '%avtempmarnow%';
+$avtempaprnow = '%avtempaprnow%';
+$avtempmaynow = '%avtempmaynow%';
+$avtempjunnow = '%avtempjunnow%';
+$avtempjulnow = '%avtempjulnow%';
+$avtempaugnow = '%avtempaugnow%';
+$avtempsepnow = '%avtempsepnow%';
+$avtempoctnow = '%avtempoctnow%';
+$avtempnovnow = '%avtempnovnow%';
+$avtempdecnow = '%avtempdecnow%';
+$avtempjan = '%avtempjan%';//Average temperature for january from your data
+$avtempfeb = '%avtempfeb%';//Average temperature for february from your data
+$avtempmar = '%avtempmar%';//Average temperature for march from your data
+$avtempapr = '%avtempapr%';//Average temperature for april from your data
+$avtempmay = '%avtempmay%';//Average temperature for may from your data
+$avtempjun = '%avtempjun%';//Average temperature for june from your data
+$avtempjul = '%avtempjul%';//Average temperature for july from your data
+$avtempaug = '%avtempaug%';//Average temperature for august from your data
+$avtempsep = '%avtempsep%';//Average temperature for september from your data
+$avtempoct = '%avtempoct%';//Average temperature for october from your data
+$avtempnov = '%avtempnov%';//Average temperature for november from your data
+$avtempdec = '%avtempdec%';//Average temperature for december from your data
+
+//For the Rain Trending Chart, you Need to add the following to your testtags file if they don't yet exist:
+
+//Start Rain Trending
+$avrainjan = '%avrainjan%';
+$avrainfeb = '%avrainfeb%';
+$avrainmar = '%avrainmar%';
+$avrainapr = '%avrainapr%';
+$avrainmay = '%avrainmay%';
+$avrainjun = '%avrainjun%';
+$avrainjul = '%avrainjul%';
+$avrainaug = '%avrainaug%';
+$avrainsep = '%avrainsep%';
+$avrainoct = '%avrainoct%';
+$avrainnov = '%avrainnov%';
+$avraindec = '%avraindec%';
+
+$avrainjannow = '%nowrainjan%';
+$avrainfebnow = '%nowrainfeb%';
+$avrainmarnow = '%nowrainmar%';
+$avrainaprnow = '%nowrainapr%';
+$avrainmaynow = '%nowrainmay%';
+$avrainjunnow = '%nowrainjun%';
+$avrainjulnow = '%nowrainjul%';
+$avrainaugnow = '%nowrainaug%';
+$avrainsepnow = '%nowrainsep%';
+$avrainoctnow = '%nowrainoct%';
+$avrainnovnow = '%nowrainnov%';
+$avraindecnow = '%nowraindec%';
+//End Rain Trending
+// end of relayweather tags
+// ----------------------------------------------------------------------------------------------------
+// eastmasonville wxrecord.php tags
+$recordhightemp = '%recordhightemp%';
+$recordlowtemp = '%recordlowtemp%';
+$recordhighheatindex = '%recordhighheatindex%';
+$recordlowchill = '%recordlowchill%';
+$warmestdayonrecord = '%warmestdayonrecord%';
+$warmestnightonrecord = '%warmestnightonrecord%';
+$coldestdayonrecord = '%coldestdayonrecord%';
+$coldestnightonrecord = '%coldestnightonrecord%';
+$recordwindgust = '%recordwindgust%';
+$recordwindspeed = '%recordwindspeed%';
+$recordhighwindrun = '%recordhighwindrun%';
+$recorddailyrain = '%recorddailyrain%';
+$recordhighrainmth = '%recordhighrainmth%';
+$recordrainrate = '%recordrainrate%';
+$recorddayswithrain = '%recorddayswithrain%';
+$recorddaysnorain = '%recorddaysnorain%';
+$recordhighdew = '%recordhighdew%';
+$recordlowdew = '%recordlowdew%';
+$recordhighhum = '%recordhighhum%';
+$recordlowhum = '%recordlowhum%';
+$recordhighbaro = '%recordhighbaro%';
+$recordlowbaro = '%recordlowbaro%';
+$recordhighsolar = '%recordhighsolar%';
+$recordhightempmonth = '%recordhightempmonth%';
+$recordhightempday = '%recordhightempday%';
+$recordhightempyear = '%recordhightempyear%';
+$recordlowtempmonth = '%recordlowtempmonth%';
+$recordlowtempday = '%recordlowtempday%';
+$recordlowtempyear = '%recordlowtempyear%';
+$recordhighheatindexmonth = '%recordhighheatindexmonth%';
+$recordhighheatindexday = '%recordhighheatindexday%';
+$recordhighheatindexyear = '%recordhighheatindexyear%';
+$recordlowchillmonth = '%recordlowchillmonth%';
+$recordlowchillday = '%recordlowchillday%';
+$recordlowchillyear = '%recordlowchillyear%';
+$recordhighgustmonth = '%recordhighgustmonth%';
+$recordhighgustday = '%recordhighgustday%';
+$recordhighgustyear = '%recordhighgustyear%';
+$recordhighavwindmonth = '%recordhighavwindmonth%';
+$recordhighavwindday = '%recordhighavwindday%';
+$recordhighavwindyear = '%recordhighavwindyear%';
+$recordhighwindrunmth = '%recordhighwindrunmth%';
+$recordhighwindrunday = '%recordhighwindrunday%';
+$recordhighwindrunyr = '%recordhighwindrunyr%';
+$recorddailyrainmonth = '%recorddailyrainmonth%';
+$recorddailyrainday = '%recorddailyrainday%';
+$recorddailyrainyear = '%recorddailyrainyear%';
+$recordhighrainmthmth = '%recordhighrainmthmth%';
+$recordhighrainmthyr = '%recordhighrainmthyr%';
+$recordrainratemonth = '%recordrainratemonth%';
+$recordrainrateday = '%recordrainrateday%';
+$recordrainrateyear = '%recordrainrateyear%';
+$recorddayswithrainmonth = '%recorddayswithrainmonth%';
+$recorddayswithrainday = '%recorddayswithrainday%';
+$recorddayswithrainyear = '%recorddayswithrainyear%';
+$recorddaysnorainmonth = '%recorddaysnorainmonth%';
+$recorddaysnorainday = '%recorddaysnorainday%';
+$recorddaysnorainyear = '%recorddaysnorainyear%';
+$recordhighdewmonth = '%recordhighdewmonth%';
+$recordhighdewday = '%recordhighdewday%';
+$recordhighdewyear = '%recordhighdewyear%';
+$recordlowdewmonth = '%recordlowdewmonth%';
+$recordlowdewday = '%recordlowdewday%';
+$recordlowdewyear = '%recordlowdewyear%';
+$recordhighhummonth = '%recordhighhummonth%';
+$recordhighhumday = '%recordhighhumday%';
+$recordhighhumyear = '%recordhighhumyear%';
+$recordlowhummonth = '%recordlowhummonth%';
+$recordlowhumday = '%recordlowhumday%';
+$recordlowhumyear = '%recordlowhumyear%';
+$recordhighbaromonth = '%recordhighbaromonth%';
+$recordhighbaroday = '%recordhighbaroday%';
+$recordhighbaroyear = '%recordhighbaroyear%';
+$recordlowbaromonth = '%recordlowbaromonth%';
+$recordlowbaroday = '%recordlowbaroday%';
+$recordlowbaroyear = '%recordlowbaroyear%';
+$recordhighsolarmonth = '%recordhighsolarmonth%';
+$recordhighsolarday = '%recordhighsolarday%';
+$recordhighsolaryear = '%recordhighsolaryear%';
+$recordhighuv = '%recordhighuv%';
+$recordhighuvmonth = '%recordhighuvmonth%';
+$recordhighuvday = '%recordhighuvday%';
+$recordhighuvyear = '%recordhighuvyear%';
+
+$yrecordhighheatindex = '%yrecordhighheatindex%';
+$yrecordhighheatindexmonth = '%yrecordhighheatindexmonth%';
+$yrecordhighheatindexday = '%yrecordhighheatindexday%';
+$yrecordhighheatindexyear = '%yrecordhighheatindexyear%';
+$ywarmestdayonrecord = '%ywarmestdayonrecord%';
+$ywarmestnightonrecord = '%ywarmestnightonrecord%';
+$ycoldestdayonrecord = '%ycoldestdayonrecord%';
+$ycoldestnightonrecord = '%ycoldestnightonrecord%';
+$yrecordhighwindrun = '%yrecordhighwindrun%';
+$yrecordhighwindrunmth = '%yrecordhighwindrunmth%';
+$yrecordhighwindrunday = '%yrecordhighwindrunday%';
+$yrecordhighwindrunyr = '%yrecordhighwindrunyr%';
+$yrecorddailyrain = '%yrecorddailyrain%';
+$yrecordhighrainmth = '%yrecordhighrainmth%';
+$yrecordrainrate = '%yrecordrainrate%';
+$yrecorddayswithrain = '%yrecorddayswithrain%';
+$yrecorddaysnorain = '%yrecorddaysnorain%';
+$yrecordhighdew = '%yrecordhighdew%';
+$yrecordlowdew = '%yrecordlowdew%';
+$yrecordhighhum = '%yrecordhighhum%';
+$yrecordlowhum = '%yrecordlowhum%';
+$yrecorddailyrainmonth = '%yrecorddailyrainmonth%';
+$yrecorddailyrainday = '%yrecorddailyrainday%';
+$yrecorddailyrainyear = '%yrecorddailyrainyear%';
+$yrecordhighrainmthmth = '%yrecordhighrainmthmth%';
+$yrecordhighrainmthyr = '%yrecordhighrainmthyr%';
+$yrecordrainratemonth = '%yrecordrainratemonth%';
+$yrecordrainrateday = '%yrecordrainrateday%';
+$yrecordrainrateyear = '%yrecordrainrateyear%';
+$yrecorddayswithrainmonth = '%yrecorddayswithrainmonth%';
+$yrecorddayswithrainday = '%yrecorddayswithrainday%';
+$yrecorddaysnorainmonth = '%yrecorddaysnorainmonth%';
+$yrecorddaysnorainday = '%yrecorddaysnorainday%';
+$yrecordhighdewmonth = '%yrecordhighdewmonth%';
+$yrecordhighdewday = '%yrecordhighdewday%';
+$yrecordhighdewyear = '%yrecordhighdewyear%';
+$yrecordlowdewmonth = '%yrecordlowdewmonth%';
+$yrecordlowdewday = '%yrecordlowdewday%';
+$yrecordlowdewyear = '%yrecordlowdewyear%';
+$yrecordhighhummonth = '%yrecordhighhummonth%';
+$yrecordhighhumday = '%yrecordhighhumday%';
+$yrecordhighhumyear = '%yrecordhighhumyear%';
+$yrecordlowhummonth = '%yrecordlowhummonth%';
+$yrecordlowhumday = '%yrecordlowhumday%';
+$yrecordlowhumyear = '%yrecordlowhumyear%';
+$yrecordhighsolar = '%yrecordhighsolar%';
+$yrecordhighsolarmonth = '%yrecordhighsolarmonth%';
+$yrecordhighsolarday = '%yrecordhighsolarday%';
+$yrecordhighsolaryear = '%yrecordhighsolaryear%';
+$yrecordhighuv = '%yrecordhighuv%';
+$yrecordhighuvmonth = '%yrecordhighuvmonth%';
+$yrecordhighuvday = '%yrecordhighuvday%';
+$yrecordhighuvyear = '%yrecordhighuvyear%';
+
+$mrecordhighheatindex = '%mrecordhighheatindex%';
+$mrecordhighheatindexmonth = '%mrecordhighheatindexmonth%';
+$mrecordhighheatindexday = '%mrecordhighheatindexday%';
+$mrecordhighheatindexyear = '%mrecordhighheatindexyear%';
+$mrecordhighwindrun = '%mrecordhighwindrun%';
+$mrecordhighwindrunmth = '%mrecordhighwindrunmth%';
+$mrecordhighwindrunday = '%mrecordhighwindrunday%';
+$mrecordhighwindrunyr = '%mrecordhighwindrunyr%';
+$mrecorddailyrain = '%mrecorddailyrain%';
+$mrecordhighrainmth = '%mrecordhighrainmth%';
+$mrecordrainrate = '%mrecordrainrate%';
+$mrecorddayswithrain = '%mrecorddayswithrain%';
+$mrecorddaysnorain = '%mrecorddaysnorain%';
+$mrecordhighdew = '%mrecordhighdew%';
+$mrecordlowdew = '%mrecordlowdew%';
+$mrecordhighhum = '%mrecordhighhum%';
+$mrecordlowhum = '%mrecordlowhum%';
+$mrecorddailyrainmonth = '%mrecorddailyrainmonth%';
+$mrecorddailyrainday = '%mrecorddailyrainday%';
+$mrecorddailyrainyear = '%mrecorddailyrainyear%';
+$mrecordhighrainmthmth = '%mrecordhighrainmthmth%';
+$mrecordhighrainmthyr = '%mrecordhighrainmthyr%';
+$mrecordrainratemonth = '%mrecordrainratemonth%';
+$mrecordrainrateday = '%mrecordrainrateday%';
+$mrecordrainrateyear = '%mrecordrainrateyear%';
+$mrecorddayswithrainmonth = '%mrecorddayswithrainmonth%';
+$mrecorddayswithrainday = '%mrecorddayswithrainday%';
+$mrecorddaysnorainmonth = '%mrecorddaysnorainmonth%';
+$mrecorddaysnorainday = '%mrecorddaysnorainday%';
+$mrecordhighdewmonth = '%mrecordhighdewmonth%';
+$mrecordhighdewday = '%mrecordhighdewday%';
+$mrecordhighdewyear = '%mrecordhighdewyear%';
+$mrecordlowdewmonth = '%mrecordlowdewmonth%';
+$mrecordlowdewday = '%mrecordlowdewday%';
+$mrecordlowdewyear = '%mrecordlowdewyear%';
+$mrecordhighhummonth = '%mrecordhighhummonth%';
+$mrecordhighhumday = '%mrecordhighhumday%';
+$mrecordhighhumyear = '%mrecordhighhumyear%';
+$mrecordlowhummonth = '%mrecordlowhummonth%';
+$mrecordlowhumday = '%mrecordlowhumday%';
+$mrecordlowhumyear = '%mrecordlowhumyear%';
+$myrecordhighbaromonth = '%mrecordhighbaromonth%';
+$mrecordhighsolar = '%mrecordhighsolar%';
+$mrecordhighsolarmonth = '%mrecordhighsolarmonth%';
+$mrecordhighsolarday = '%mrecordhighsolarday%';
+$mrecordhighsolaryear = '%mrecordhighsolaryear%';
+$mrecordhighuv = '%mrecordhighuv%';
+$mrecordhighuvmonth = '%mrecordhighuvmonth%';
+$mrecordhighuvday = '%mrecordhighuvday%';
+$mrecordhighuvyear = '%mrecordhighuvyear%';
+// end of eastmasonville wxrecord.php tags
+// ----------------------------------------------------------------------------------------------------
+// other addons
+$vpissstatus = '%vpissstatus%';      // VP ISS Status
+$vpreception2 = '%vpreception2%'; // VP Current reception %  *** NEW IN V1.01
+$vpconsolebattery = '%vpconsolebattery%'; // VP Console Battery Volts *** NEW IN V1.01
+$firewi = '%FWIfwi%'; // Fire Weather Index
+$avtempweek = '%avtempweek%';    // Average Weekly Temp
+$hddday = '%hddday%';        // Heating Degree for day
+$hddmonth = '%hddmonth%';    // Heating Degree for month to date
+$hddyear = '%hddyear%';    // Heating Degree for year to date
+$cddday = '%cddday%';        // Cooling Degree for day
+$cddmonth = '%cddmonth%';    // Cooling Degree for month to date
+$cddyear = '%cddyear%';    // Cooling Degree for year to date
+$minchillweek = '%minchillweek%';  // Minimum Wind Chill over past 7 days 
+$maxheatweek = '%maxheatweek%';  // Maximum Heat Index for the Week *** NEW IN V2.00
+$airdensity = '%airdensity%';  //air density
+$solarnoon = '%solarnoon%'; // Solar noon
+$changeinday = '%changeinday%';  // change in day length since yesterday
+$etcurrentweek = '%etcurrentweek%'; // ET total for the last 7 days
+$sunshinehourstodateday = '%sunshinehourstodateday%';
+$sunshinehourstodatemonth = '%sunshinehourstodatemonth%';
+$maxsolarfortime = '%maxsolarfortime%';
+$wetbulb = '%wetbulb%';
+$lighteningcountlasthour = '%lighteningcountlasthour%';
+$lighteningcountlastminute = '%lighteningcountlastminute%';
+$lighteningcountlast5minutes = '%lighteningcountlast5minutes%';
+$lighteningcountlast12hour = '%lighteningcountlast12hour%';
+$lighteningcountlast30minutes = '%lighteningcountlast30minutes%';
+$lighteningcountlasttime = '%lighteningcountlasttime%';
+$lighteningcountmonth = '%lighteningcountmonth%';
+$lighteningcountyear = '%lighteningcountyear%';
+$chandler = '%chandler%';
+$maxdew = '%maxdew%';
+$maxdewt = '%maxdewt%';
+$mindew = '%mindew%';
+$mindewt = '%mindewt%';
+$maxdewyest = '%maxdewyest%';
+$maxdewyestt = '%maxdewyestt%';
+$mindewyest = '%mindewyest%';
+$mindewyestt = '%mindewyestt%';
+$stationname = '%stationname%';
+$raindifffromav = '%raindifffromav%';
+$raindifffromavyear = '%raindifffromavyear%';
+$gddmonth = '%gddmonth%';
+$gddyear = '%gddyear%';
+$maxheat = '%maxheat%';
+$maxheatt = '%maxheatt%'; 
+$maxheatyest = '%maxheatyest%';  
+$yeartodateavtemp = '%yeartodateavtemp%'; 
+$monthtodateavtemp = '%monthtodateavtemp%'; 
+$maxchillyest = '%maxchillyest%'; 
+$monthtodatemaxgust = '%monthtodatemaxgust%'; 
+$monthtodateavspeed = '%monthtodateavspeed%'; // MTD average wind speed
+$monthtodateavgust = '%monthtodateavgust%'; //MTD average wind gust
+$yeartodateavwind = '%yeartodateavwind%'; // YTD average wind speed
+$yeartodategstwind = '%yeartodategstwind%'; // YTD avg wind gust
+$lowbaro = '%lowbaro%';
+$lowbarot = '%lowbarot%';
+$monthtodatemaxbaro = '%monthtodatemaxbaro%'; // MTD average wind speed
+$monthtodateminbaro = '%monthtodateminbaro%'; //MTD average wind gust
+$sunshinehourstodateyear = '%sunshinehourstodateyear%'; 
+$sunshineyesterday = '%sunshineyesterday%';
+$avtempsincemidnight = '%avtempsincemidnight%';
+$yesterdayavtemp = '%yesterdayavtemp%';
+$avgspeedsincereset = '%avgspeedsincereset%';
+$maxheatyestt = '%maxheatyestt%';
+$windrunyesterday = '%windrunyesterday%';
+$currentwdet = '%currentwdet%';
+$yesterdaywdet = '%yesterdaywdet%';
+$highhum = '%highhum%';
+$highhumt = '%highhumt%';
+$lowhum = '%lowhum%';
+$lowhumt = '%lowhumt%';
+$maxhumyest = '%maxhumyest%';
+$maxhumyestt = '%maxhumyestt%';
+$minhumyest = '%minhumyest%';
+$minhumyestt = '%minhumyestt%';
+$recordhightempjan = '%recordhightempjan%';
+$recordlowtempjan = '%recordlowtempjan%';
+$recordhightempfeb = '%recordhightempfeb%';
+$recordlowtempfeb = '%recordlowtempfeb%';
+$recordhightempmar = '%recordhightempmar%';
+$recordlowtempmar = '%recordlowtempmar%';
+$recordhightempapr = '%recordhightempapr%';
+$recordlowtempapr = '%recordlowtempapr%';
+$recordhightempmay = '%recordhightempmay%';
+$recordlowtempmay = '%recordlowtempmay%';
+$recordhightempjun = '%recordhightempjun%';
+$recordlowtempjun = '%recordlowtempjun%';
+$recordhightempjul = '%recordhightempjul%';
+$recordlowtempjul = '%recordlowtempjul%';
+$recordhightempaug = '%recordhightempaug%';
+$recordlowtempaug = '%recordlowtempaug%';
+$recordhightempsep = '%recordhightempsep%';
+$recordlowtempsep = '%recordlowtempsep%';
+$recordhightempoct = '%recordhightempoct%';
+$recordlowtempoct = '%recordlowtempoct%';
+$recordhightempnov = '%recordhightempnov%';
+$recordlowtempnov = '%recordlowtempnov%';
+$recordhightempdec = '%recordhightempdec%';
+$recordlowtempdec = '%recordlowtempdec%';
+// end of other addons
+// end of testtags.txt/testtags.php
+?>
