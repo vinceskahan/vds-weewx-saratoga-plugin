@@ -37,20 +37,24 @@
 global $SITE;
 #---------------------------------------------------------------------------
 #  required settings for Weather-Display software
+#
+# this assumes saratoga is 'under' the weewx HTML_ROOT in its own directory
+# and weewx-wd is writing to a parallel WD directory also under HTML_ROOT
+#
 #---------------------------------------------------------------------------
-$SITE['WXtags']			= 'testtags.php';  // for weather variables .. we're using the old name instead of WDtags.php
+$SITE['WXtags']			= '../WD/testtags.php';  // for weather variables .. we're using the old name instead of WDtags.php
 $SITE['ajaxScript']     = 'ajaxWDwx.js'; // for AJAX enabled display
-$SITE['clientrawfile']  = 'clientraw.txt';  // directory and name of Weather-Display realtime.txt file
-$SITE['graphImageDir']  = './';  // directory location for graph images with trailing /
+$SITE['clientrawfile']  = '../WD/clientraw.txt';  // directory and name of Weather-Display realtime.txt file
+$SITE['graphImageDir']  = '../';  // directory location for graph images with trailing /
 # wxhistory.php settings
 $SITE['HistoryStartYear'] = '2000';  // start year for station operation
-$SITE['HistoryFilesDir']  = './';    // directory location for the [month][year].htm history files
-$SITE['HistoryGraphsDir'] = './';    // directory location for the YYYYMMDD.gif graphic daily report files
+$SITE['HistoryFilesDir']  = '../NOAA/';    // directory location for the [month][year].htm history files
+$SITE['HistoryGraphsDir'] = '../NOAA/';    // directory location for the YYYYMMDD.gif graphic daily report files
 # Weather Station sensors and options for dashboard
 $SITE['DavisVP']		= true;  // set to false if not a Davis VP weather station
-$SITE['UV']				= true;  // set to false if no UV sensor
-$SITE['SOLAR']			= true;  // set to false if no Solar sensor
-$SITE['showSnow']		= true;   // set to false if snow not recorded on WD
+$SITE['UV']				= false;  // set to false if no UV sensor
+$SITE['SOLAR']			= false;  // set to false if no Solar sensor
+$SITE['showSnow']		= false;   // set to false if snow not recorded on WD
 $SITE['showSnowTemp'] 	= 4;	  // show snow instead of rain if temp (C) is <= this amount
 ##########################################################################
 # end of configurable settings
